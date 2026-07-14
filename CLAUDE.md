@@ -59,8 +59,8 @@ the guard project-local first, then `~/.claude/agents/`, failing open.
 - Before any public flip or new shipped content: leak scan over the
   **tracked file list** (`git ls-files`), not a directory grep — tracked
   session artefacts once hid from a scan that excluded "ignored" dirs.
-  Patterns: the user's name/username, `glasgow`/`gla.ac.uk`, their GitHub
-  orgs. `cronmon`/`admin2x`/`lndo.site`/seeded faker names are intentional.
+  The pattern list lives in the gitignored ant foundation note (`ant
+  foundation`), so this tracked file doesn't ship the strings it hunts.
 - Outputs the skills generate in *target* apps go to `docs/user-guides/`
   and `docs/ux-journeys/`; in *this* repo, worked examples live under
   `examples/`.

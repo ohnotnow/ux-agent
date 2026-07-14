@@ -1,10 +1,43 @@
-<!doctype html>
-<html lang="en-GB">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Silencing alerts for a job</title>
-<style>
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "pyyaml",
+#     "markdown",
+# ]
+# ///
+"""Render a user-guide doc.yaml (+ its clips/) into one self-contained HTML page.
+
+Usage:
+    uv run render.py --input docs/user-guides/<slug>/doc.yaml [--output page.html]
+
+The default output is preview.html next to the input file. Video paths in
+doc.yaml are relative to the doc, so the page must live beside the clips
+for them to resolve.
+
+The output makes no external requests — no CDN, no web fonts. It's one file
+you can email round or drop on a shared drive.
+"""
+
+import argparse
+import sys
+from datetime import date
+from html import escape
+from pathlib import Path
+from string import Template
+
+import markdown
+import yaml
+
+# ---------------------------------------------------------------------------
+# House style — swap this block for yours.
+#
+# Our house look: navy masthead, arrow bullets, Noto Sans wherever the
+# reader's machine already has it — but never fetched, because self-contained
+# output is a hard requirement, so there is no web-font link. Other teams:
+# replace the variables in :root and anything else that offends you.
+# ---------------------------------------------------------------------------
+STYLESHEET = """\
 :root {
   --brand-blue: #011451;
   --brand-dark-blue: #005398;
@@ -210,7 +243,7 @@ ul > li {
   margin-bottom: var(--space-3);
 }
 ul > li::before {
-  content: "\2192";
+  content: "\\2192";
   position: absolute;
   left: 0;
   top: 0;
@@ -383,48 +416,125 @@ img {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+"""
+# --------------------------- end of house style ---------------------------
 
+PAGE_TEMPLATE = Template("""\
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title</title>
+<style>
+$css
 </style>
 </head>
 <body>
 <header class="page-head">
   <div class="page-head-inner">
-    <h1 class="page-heading">Silencing alerts for a job</h1>
+    <h1 class="page-heading">$title</h1>
   </div>
 </header>
 <div class="page">
   <main class="page-body">
     <div class="intro">
-<p>If a job is going to miss its check-ins for a known reason — planned
-maintenance, a service upgrade, building works — you can silence it so
-Cronmon doesn't send alerts in the meantime. This guide walks through
-silencing a job and leaving a note for your colleagues explaining why.</p>
+$intro
     </div>
-<h2><span class="step-number">1</span>Log in</h2>
-<p>Go to Cronmon and sign in with your usual username and password.</p>
-<video controls preload="metadata" src="clips/01-log-in.mp4"></video>
-
-<h2><span class="step-number">2</span>Find the job</h2>
-<p>Your jobs are listed on the home page. Type part of a job's name into
-the filter box to narrow the list, then click the job you want — here
-we're using the <code>rotate-logs</code> job.</p>
-<video controls preload="metadata" src="clips/02-find-the-job.mp4"></video>
-
-<h2><span class="step-number">3</span>Silence the job</h2>
-<p>Click the <strong>Silenced</strong> switch. Two extra fields appear: <em>Silenced
-until</em>, which is set to 24 hours from now unless you change it, and an
-optional <em>Reason</em>. Type a short reason so your colleagues can see why
-alerts are off — for example, "service is being upgraded".</p>
-<p>There's no save button — your changes take effect straight away, and
-Cronmon won't alert about this job until the <em>Silenced until</em> time
-passes.</p>
-<video controls preload="metadata" src="clips/03-silence-the-job.mp4"></video>
-
+$steps
   </main>
   <footer class="page-foot">
-    <span class="foot-title">Silencing alerts for a job</span>
-    <span class="foot-year">2026</span>
+    <span class="foot-title">$title</span>
+    <span class="foot-year">$year</span>
   </footer>
 </div>
 </body>
 </html>
+""")
+
+STEP_TEMPLATE = Template("""\
+<h2><span class="step-number">$number</span>$heading</h2>
+$body
+""")
+
+VIDEO_TEMPLATE = Template(
+    '<video controls preload="metadata" src="$src"></video>\n'
+)
+
+
+def md(text: str) -> str:
+    return markdown.markdown(text, extensions=["extra"])
+
+
+def render_steps(steps: list, doc_dir: Path) -> str:
+    parts = []
+    for number, step in enumerate(steps, start=1):
+        heading = step.get("heading")
+        if not heading:
+            sys.exit(f"render: step {number} has no heading")
+        rendered = STEP_TEMPLATE.substitute(
+            number=number,
+            heading=escape(heading),
+            body=md(step.get("body", "")),
+        )
+        video = step.get("video")
+        if video:
+            if not (doc_dir / video).is_file():
+                print(
+                    f"render: warning: step {number} ({heading!r}): "
+                    f"video file not found: {video}",
+                    file=sys.stderr,
+                )
+            rendered += VIDEO_TEMPLATE.substitute(src=escape(video, quote=True))
+        parts.append(rendered)
+    return "\n".join(parts)
+
+
+def render_page(doc: dict, doc_dir: Path) -> str:
+    title = doc.get("title")
+    if not title:
+        sys.exit("render: doc.yaml has no title")
+    steps = doc.get("steps")
+    if not steps:
+        sys.exit("render: doc.yaml has no steps")
+    return PAGE_TEMPLATE.substitute(
+        title=escape(title),
+        css=STYLESHEET,
+        intro=md(doc.get("intro", "")),
+        steps=render_steps(steps, doc_dir),
+        year=date.today().year,
+    )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Render a user-guide doc.yaml into a self-contained HTML page."
+    )
+    parser.add_argument(
+        "--input", required=True, help="path to the guide's doc.yaml"
+    )
+    parser.add_argument(
+        "--output",
+        help="output HTML path (default: preview.html next to the input)",
+    )
+    args = parser.parse_args()
+
+    input_path = Path(args.input)
+    try:
+        doc = yaml.safe_load(input_path.read_text(encoding="utf-8"))
+    except OSError as err:
+        sys.exit(f"render: cannot read {input_path}: {err.strerror}")
+    except yaml.YAMLError as err:
+        sys.exit(f"render: {input_path} is not valid YAML: {err}")
+    if not isinstance(doc, dict):
+        sys.exit(f"render: {input_path} does not look like a guide doc.yaml")
+
+    page = render_page(doc, input_path.parent)
+
+    output_path = Path(args.output) if args.output else input_path.parent / "preview.html"
+    output_path.write_text(page, encoding="utf-8")
+    print(f"wrote {output_path}")
+
+
+if __name__ == "__main__":
+    main()

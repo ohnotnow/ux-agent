@@ -62,7 +62,9 @@ skill, against a Laravel/Livewire app:
 ## Install
 
 You'll need [Claude Code](https://claude.com/claude-code),
-`@playwright/cli` (`npm install -g @playwright/cli`), and `ffmpeg`.
+`@playwright/cli` (`npm install -g @playwright/cli`), `ffmpeg`, and
+[uv](https://docs.astral.sh/uv/) (the user-guide render CLI is a
+single-file uv-run Python script).
 
 ```bash
 git clone git@github.com:ohnotnow/ux-agent.git
@@ -82,7 +84,10 @@ These skills encode *our* habits: Laravel + Livewire apps, Lando local dev
 every app, Laravel Debugbar to hide or ignore. The mechanics are
 stack-agnostic; the conventions are not. Read the skills through and swap in
 your own before adopting. Each one keeps its conventions in a clearly
-marked section.
+marked section. That includes the look of the rendered user guides: the
+house stylesheet sits in one marked block at the top of
+`claude/skills/user-guide-video/render.py`, ready to be swapped for your
+own brand.
 
 ## Not using Claude Code?
 
@@ -94,9 +99,10 @@ sub-agents, the probe's markdown tells you exactly what to recreate.
 
 ## Status
 
-Early days, shared as-is. A `render` CLI (`doc.yaml` + clips → styled HTML)
-is planned; the `preview.html` files in the examples are hand-rolled
-stand-ins for its output. Expect the odd rename while things settle.
+Early days, shared as-is. The `preview.html` files in the examples are
+genuine output from the render CLI
+(`claude/skills/user-guide-video/render.py`). Expect the odd rename while
+things settle.
 
 ## Licence
 
