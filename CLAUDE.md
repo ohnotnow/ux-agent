@@ -19,6 +19,13 @@ are initialised here.
   `.claude/agents/*` ARE symlinks into `claude/agents/`.)
 - The dir is named `playwright-test-video` locally but the project/repo is
   **ux-agent** (github.com/ohnotnow/ux-agent, private).
+- The two `examples/user-guides/*/preview.html` files must stay genuine
+  output of `claude/skills/user-guide-video/render.py` — the README's
+  Status section promises it. After ANY change to render.py, re-render
+  both (`uv run claude/skills/user-guide-video/render.py --input
+  examples/user-guides/<slug>/doc.yaml` for each slug) and ship them in
+  the same commit. render.py lives in a skill dir, so the `.claude/skills`
+  re-copy rule above applies to it too.
 
 ## Testing the skills
 
