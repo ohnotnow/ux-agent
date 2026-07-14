@@ -1,0 +1,30 @@
+title: Silencing alerts for a job
+intro: |
+  If a job is going to miss its check-ins for a known reason — planned
+  maintenance, a service upgrade, building works — you can silence it so
+  Cronmon doesn't send alerts in the meantime. This guide walks through
+  silencing a job and leaving a note for your colleagues explaining why.
+steps:
+  - heading: Log in
+    body: |
+      Go to Cronmon and sign in with your usual username and password.
+    video: clips/01-log-in.mp4
+
+  - heading: Find the job
+    body: |
+      Your jobs are listed on the home page. Type part of a job's name into
+      the filter box to narrow the list, then click the job you want — here
+      we're using the `rotate-logs` job.
+    video: clips/02-find-the-job.mp4
+
+  - heading: Silence the job
+    body: |
+      Click the **Silenced** switch. Two extra fields appear: *Silenced
+      until*, which is set to 24 hours from now unless you change it, and an
+      optional *Reason*. Type a short reason so your colleagues can see why
+      alerts are off — for example, "service is being upgraded".
+
+      There's no save button — your changes take effect straight away, and
+      Cronmon won't alert about this job until the *Silenced until* time
+      passes.
+    video: clips/03-silence-the-job.mp4

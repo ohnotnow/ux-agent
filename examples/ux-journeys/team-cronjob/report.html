@@ -1,0 +1,218 @@
+<!--
+  UX journey report, compiled from journey-log.md (the evidence sidecar —
+  every quote and event below corresponds to a numbered entry in the log,
+  which was written in the moment, expectations recorded before outcomes).
+  The traversal was performed by a context-free agent given only the URL,
+  a login, and the task.
+-->
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UX journey: moving a new cronjob to a team</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    line-height: 1.6;
+    color: #1a1a2e;
+  }
+  h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.5rem; }
+  .meta {
+    background: #f6f6fa;
+    border: 1px solid #e3e3ee;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  .meta dt { font-weight: 600; margin-top: 0.5rem; }
+  .meta dt:first-child { margin-top: 0; }
+  .meta dd { margin: 0; }
+  .verdict {
+    display: inline-block;
+    background: #b45309;
+    color: white;
+    border-radius: 999px;
+    padding: 0.15rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  blockquote {
+    border-left: 3px solid #4f46e5;
+    margin: 1rem 0;
+    padding: 0.25rem 0 0.25rem 1rem;
+    color: #3a3a52;
+    font-style: italic;
+  }
+  img {
+    max-width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+  }
+  figure { margin: 1rem 0; }
+  figcaption { font-size: 0.85rem; color: #666; margin-top: 0.35rem; }
+  .finding {
+    border: 1px solid #e3e3ee;
+    border-left: 4px solid #4f46e5;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+  }
+  .finding.major { border-left-color: #dc2626; }
+  .finding h3 { margin: 0 0 0.35rem; font-size: 1.02rem; }
+  .finding p { margin: 0.35rem 0; }
+  .stats {
+    background: #f6f6fa;
+    border: 1px solid #e3e3ee;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 2.5rem;
+    font-size: 0.95rem;
+  }
+  .stats table { border-collapse: collapse; width: 100%; }
+  .stats td { padding: 0.25rem 0.5rem 0.25rem 0; vertical-align: top; }
+  .stats td:first-child { font-weight: 600; white-space: nowrap; }
+  .evidence { font-size: 0.85rem; color: #666; margin-top: 2rem; }
+</style>
+</head>
+<body>
+
+<h1>UX journey: moving a new cronjob to a team</h1>
+
+<dl class="meta">
+  <dt>The task, as a manager would phrase it</dt>
+  <dd>"Create a new cronjob for 'Nightly Photo Backups' that runs daily,
+  grace period of 2hrs, personal. Once it's created, change it to belong to
+  the 'Fulfilment' team."</dd>
+  <dt>Who attempted it</dt>
+  <dd>A context-free agent — no knowledge of Cronmon beyond the URL and an
+  admin login — behaving as a patient end user. 13 July 2026.</dd>
+  <dt>Outcome</dt>
+  <dd><span class="verdict">Completed — via an unsignposted detour</span></dd>
+</dl>
+
+<h2>Creating the job: genuinely pleasant</h2>
+<p>Login was unremarkable, the <strong>New job</strong> button was where
+instinct looked for it, and the creation form answered the manager's phrasing
+almost word for word: an interval picker ("1 × Daily") instead of demanding
+cron syntax, a grace period control taking "2" and "Hours", and a Team
+dropdown whose helper text — "Leave blank to make this a personal job" —
+resolved the "personal" requirement before it became a question. First half
+of the task: about a minute, zero friction.</p>
+<p>One cloud on the horizon, noticed in passing while the form was open:</p>
+<blockquote>The Team dropdown only lists "Application Development" and
+"Infrastructure" — I don't see a "Fulfilment" team. That worries me a little
+for the second half of my task.</blockquote>
+
+<h2>The trap: "Fulfilment doesn't seem to exist"</h2>
+<p>Editing the new job reopened the same form — still no Fulfilment in the
+dropdown, and nothing to suggest why. At this point the app has, in effect,
+told the user the team doesn't exist:</p>
+<blockquote>So my manager has asked me to assign the job to a team that
+doesn't exist in the system yet. Slight "…now what?" moment here.</blockquote>
+<figure>
+  <img src="shots/06-edit-no-fulfilment-team.png"
+       alt="Edit job modal with no Fulfilment option in the Team dropdown">
+  <figcaption>The edit modal. The Team dropdown (just below the fold here)
+  offered only the user's own two teams — no hint that four others
+  existed.</figcaption>
+</figure>
+
+<h2>The accidental rescue: admin rights</h2>
+<p>The user's plan was now to <em>create</em> the missing team in the Admin
+area. Only on arriving there did the "By team" statistics table reveal, in
+passing, that Fulfilment already existed with 3 jobs:</p>
+<blockquote>So the team exists after all. The job form's Team dropdown must
+only show teams <em>I'm a member of</em>. That was genuinely confusing — the
+dropdown gave me no hint that other teams existed but were hidden from
+me.</blockquote>
+<figure>
+  <img src="shots/07-admin-fulfilment-exists.png"
+       alt="Admin dashboard whose By team table lists Fulfilment">
+  <figcaption>The discovery was incidental: a statistics table, not any
+  affordance of the job form, revealed the team's existence.</figcaption>
+</figure>
+<p>Two counterfactuals worth sitting with. A <strong>non-admin</strong> given
+this task has no Admin area and dead-ends completely. And a <strong>hastier
+admin</strong> stood one click from creating a duplicate team — the
+<strong>New team</strong> button was right beside the evidence.</p>
+
+<h2>The workaround: join the team to be allowed to see it</h2>
+<p>Deducing that membership gates the dropdown, the user added themself to
+Fulfilment via Admin → Teams — pausing over a small identity wobble
+(logged in as <code>admin2x</code>, but listed as "Jenny MacAdmin"; the
+account email was the only bridge). Membership granted, the edit form now
+offered Fulfilment, and the change saved cleanly with a "Job updated."
+toast.</p>
+<figure>
+  <img src="shots/12-job-now-fulfilment.png"
+       alt="Job page showing Team: Fulfilment">
+  <figcaption>Task complete: "Team: Fulfilment" on the job page.</figcaption>
+</figure>
+
+<h2>A last wobble: the filter</h2>
+<p>Verifying on the dashboard, filtering Team jobs for "Nightly Photo"
+surfaced dozens of <em>other</em> teams' nightly jobs — the filter matches
+any word, not the phrase — briefly suggesting the reassignment hadn't worked.
+Filtering on "Photo" alone found the job, correctly assigned.</p>
+
+<h2>Findings</h2>
+
+<div class="finding major">
+  <h3>1. The Team dropdown silently hides teams you're not in</h3>
+  <p>It conflates "doesn't exist" with "not yours to choose", and offers no
+  hint that anything is hidden. The observed cost for an admin: a four-step
+  detour and a near-miss duplicate team. The cost for a non-admin: a dead
+  end. (Log entries 3, 6, 7.)</p>
+  <p><em>Smallest possible fix:</em> one line of helper text — "Only teams
+  you belong to are shown." <em>Fuller fix:</em> see discussion.</p>
+</div>
+
+<div class="finding">
+  <h3>2. No direct path for "put this job under team X"</h3>
+  <p>The only route is: be (or become) a member, then edit the job. The team
+  page manages members and silencing but says nothing about jobs, so the
+  route is invisible until already known. (Log entries 9, 12.)</p>
+</div>
+
+<div class="finding">
+  <h3>3. Users can't recognise themselves in user lists</h3>
+  <p>Logged in as <code>admin2x</code>, listed as "Jenny MacAdmin". A
+  "(you)" marker in member/user lists would remove the guesswork. (Log
+  entry 10.)</p>
+</div>
+
+<div class="finding">
+  <h3>4. The dashboard filter matches any word, not the phrase</h3>
+  <p>"Nightly Photo" matched every team's nightly jobs and pushed the actual
+  match out of view — enough to cast doubt on a just-completed action.
+  Requiring all words would fix it. (Log entry 12.)</p>
+</div>
+
+<div class="stats">
+  <table>
+    <tr><td>Creating the job</td>
+        <td>~8 actions, 1 page, no friction</td></tr>
+    <tr><td>Reassigning it — plausible ideal</td>
+        <td>4 actions, 1 page (open job → Edit → pick team → Save)</td></tr>
+    <tr><td>Reassigning it — as it went</td>
+        <td>18 actions across 7 page visits, including a round trip through
+        the admin area and a permanent change to team membership</td></tr>
+    <tr><td>Dead ends</td>
+        <td>1 avoided only by admin rights; would be terminal for a normal
+        user</td></tr>
+  </table>
+</div>
+
+<p class="evidence">Evidence: <a href="journey-log.md">journey-log.md</a>
+(in-the-moment think-aloud log; expectations recorded before outcomes) and
+the <a href="shots/">shots/</a> directory (12 screenshots).</p>
+
+</body>
+</html>

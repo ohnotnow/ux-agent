@@ -1,0 +1,80 @@
+<!--
+  Hand-rolled stand-in for the output of the yet-to-be-created render CLI:
+  what `render --input doc.yaml --output silencing-a-job.html` would emit.
+  Open directly in a browser: open silencing-a-job/preview.html
+-->
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silencing alerts for a job</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    line-height: 1.6;
+    color: #1a1a2e;
+  }
+  h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.5rem; }
+  h2 .step-number {
+    display: inline-block;
+    background: #4f46e5;
+    color: white;
+    border-radius: 50%;
+    width: 1.6rem;
+    height: 1.6rem;
+    text-align: center;
+    line-height: 1.6rem;
+    font-size: 0.95rem;
+    margin-right: 0.5rem;
+  }
+  .intro { color: #444; }
+  video {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+  }
+  code {
+    background: #f0f0f5;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  em { font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Silencing alerts for a job</h1>
+<p class="intro">If a job is going to miss its check-ins for a known reason —
+planned maintenance, a service upgrade, building works — you can silence it so
+Cronmon doesn't send alerts in the meantime. This guide walks through
+silencing a job and leaving a note for your colleagues explaining why.</p>
+
+<h2><span class="step-number">1</span>Log in</h2>
+<p>Go to Cronmon and sign in with your usual username and password.</p>
+<video controls preload="metadata" src="clips/01-log-in.mp4"></video>
+
+<h2><span class="step-number">2</span>Find the job</h2>
+<p>Your jobs are listed on the home page. Type part of a job's name into the
+filter box to narrow the list, then click the job you want — here we're using
+the <code>rotate-logs</code> job.</p>
+<video controls preload="metadata" src="clips/02-find-the-job.mp4"></video>
+
+<h2><span class="step-number">3</span>Silence the job</h2>
+<p>Click the <strong>Silenced</strong> switch. Two extra fields appear:
+<em>Silenced until</em>, which is set to 24 hours from now unless you change
+it, and an optional <em>Reason</em>. Type a short reason so your colleagues
+can see why alerts are off — for example, "service is being upgraded".</p>
+<p>There's no save button — your changes take effect straight away, and
+Cronmon won't alert about this job until the <em>Silenced until</em> time
+passes.</p>
+<video controls preload="metadata" src="clips/03-silence-the-job.mp4"></video>
+
+</body>
+</html>

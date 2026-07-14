@@ -1,0 +1,85 @@
+<!--
+  Hand-rolled stand-in for the output of the yet-to-be-created render CLI:
+  what `render --input doc.yaml --output create-a-new-user.html` would emit.
+  Open directly in a browser.
+-->
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adding a new user and putting them in a team</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    line-height: 1.6;
+    color: #1a1a2e;
+  }
+  h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.5rem; }
+  h2 .step-number {
+    display: inline-block;
+    background: #4f46e5;
+    color: white;
+    border-radius: 50%;
+    width: 1.6rem;
+    height: 1.6rem;
+    text-align: center;
+    line-height: 1.6rem;
+    font-size: 0.95rem;
+    margin-right: 0.5rem;
+  }
+  .intro { color: #444; }
+  video {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+  }
+  em { font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Adding a new user and putting them in a team</h1>
+<p class="intro">New colleagues need a Cronmon account before they can see
+their team's jobs. This guide walks through creating the account and adding
+it to a team. You'll need admin rights — if you can't see
+<strong>Admin</strong> in the sidebar, ask an existing administrator.</p>
+
+<h2><span class="step-number">1</span>Log in</h2>
+<p>Go to Cronmon and sign in with your usual username and password.</p>
+<video controls preload="metadata" src="clips/01-log-in.mp4"></video>
+
+<h2><span class="step-number">2</span>Open the admin area</h2>
+<p>Click <strong>Admin</strong> in the sidebar, then choose
+<strong>Users</strong>.</p>
+<video controls preload="metadata" src="clips/02-open-the-admin-area.mp4"></video>
+
+<h2><span class="step-number">3</span>Create the user</h2>
+<p>Click <strong>New user</strong>. Fill in the person's SSO username, their
+forenames and surname, and their email address, then click
+<strong>Save</strong>.</p>
+<p>The new account is a normal user — if they need admin rights, use the
+<strong>Admin</strong> toggle next to their name in the users list
+afterwards.</p>
+<video controls preload="metadata" src="clips/03-create-the-user.mp4"></video>
+
+<h2><span class="step-number">4</span>Find the team</h2>
+<p>Head back to <strong>Admin</strong> in the sidebar and choose
+<strong>Teams</strong>, then click the team the person belongs to — here
+that's <em>Application Development</em>.</p>
+<video controls preload="metadata" src="clips/04-find-the-team.mp4"></video>
+
+<h2><span class="step-number">5</span>Add them to the team</h2>
+<p>Click the <strong>Add a user…</strong> box and type part of the person's
+name to narrow the list. Pick them, then click <strong>Add</strong>. They'll
+appear in the members list straight away, and they'll see the team's jobs
+the next time they log in.</p>
+<video controls preload="metadata" src="clips/05-add-them-to-the-team.mp4"></video>
+
+</body>
+</html>

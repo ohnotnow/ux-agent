@@ -1,0 +1,39 @@
+title: Adding a new user and putting them in a team
+intro: |
+  New colleagues need a Cronmon account before they can see their team's
+  jobs. This guide walks through creating the account and adding it to a
+  team. You'll need admin rights — if you can't see **Admin** in the
+  sidebar, ask an existing administrator.
+steps:
+  - heading: Log in
+    body: |
+      Go to Cronmon and sign in with your usual username and password.
+    video: clips/01-log-in.mp4
+
+  - heading: Open the admin area
+    body: |
+      Click **Admin** in the sidebar, then choose **Users**.
+    video: clips/02-open-the-admin-area.mp4
+
+  - heading: Create the user
+    body: |
+      Click **New user**. Fill in the person's SSO username, their forenames
+      and surname, and their email address, then click **Save**.
+
+      The new account is a normal user — if they need admin rights, use the
+      **Admin** toggle next to their name in the users list afterwards.
+    video: clips/03-create-the-user.mp4
+
+  - heading: Find the team
+    body: |
+      Head back to **Admin** in the sidebar and choose **Teams**, then click
+      the team the person belongs to — here that's *Application Development*.
+    video: clips/04-find-the-team.mp4
+
+  - heading: Add them to the team
+    body: |
+      Click the **Add a user…** box and type part of the person's name to
+      narrow the list. Pick them, then click **Add**. They'll appear in the
+      members list straight away, and they'll see the team's jobs the next
+      time they log in.
+    video: clips/05-add-them-to-the-team.mp4
