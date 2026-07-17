@@ -14,11 +14,12 @@ are initialised here.
 - `claude/` is the **canonical, tracked** home of skills and agents.
 - `.claude/skills/` is a **gitignored local copy** so the skills work when
   running Claude Code in this repo. Edit `claude/skills/...` first, then
-  `cp -r claude/skills/* .claude/skills/`. (History: directory symlinks
+  sync with `./install.sh .` (it re-copies the skills and safely skips
+  the symlinked agents). (History: directory symlinks
   broke both git pathspecs and agent-commit; file symlinks were fine, so
   `.claude/agents/*` ARE symlinks into `claude/agents/`.)
 - The dir is named `playwright-test-video` locally but the project/repo is
-  **ux-agent** (github.com/ohnotnow/ux-agent, private).
+  **ux-agent** (github.com/ohnotnow/ux-agent, public as of mid-July 2026).
 - The two `examples/user-guides/*/preview.html` files must stay genuine
   output of `claude/skills/user-guide-video/render.py` — the README's
   Status section promises it. After ANY change to render.py, re-render

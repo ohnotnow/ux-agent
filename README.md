@@ -69,13 +69,13 @@ single-file uv-run Python script).
 ```bash
 git clone git@github.com:ohnotnow/ux-agent.git
 cd ux-agent
-cp -r claude/skills/* ~/.claude/skills/
-cp claude/agents/* ~/.claude/agents/
+./install.sh                        # global: ~/.claude/
+./install.sh ~/code/some-project    # or per-project: <path>/.claude/
 ```
 
-That's the whole install. The skills don't reference the clone, so nothing
-else to wire up. Prefer it per-project rather than global? Copy the same
-files into an app's `.claude/skills/` and `.claude/agents/` instead.
+That's the whole install — the script just copies `claude/skills/*` and
+`claude/agents/*` into place, and it's safe to re-run after a `git pull`.
+The skills don't reference the clone, so nothing else to wire up.
 
 ## A word about house conventions
 
@@ -103,6 +103,18 @@ Early days, shared as-is. The `preview.html` files in the examples are
 genuine output from the render CLI
 (`claude/skills/user-guide-video/render.py`). Expect the odd rename while
 things settle.
+
+## You might also be interested in
+
+- [a11y-agent](https://github.com/ohnotnow/a11y-agent) — the same idea pointed
+  at accessibility: a deterministic CLI (axe scan, keyboard tab-order walk,
+  screen-reader transcript) your agent can run against any local page, plus a
+  ready-made skill and background checker agent. The audit you were never
+  going to get round to by hand.
+- [agentic-stuff](https://github.com/ohnotnow/agentic-stuff) — the wider
+  collection of Claude Code skills and agents these tools grew up alongside
+  (Laravel/Livewire-leaning), including a quality-gate review stack that can
+  call on both of these as part of a post-feature check.
 
 ## Licence
 
