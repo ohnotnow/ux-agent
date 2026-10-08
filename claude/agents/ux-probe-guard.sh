@@ -62,8 +62,10 @@ elif tool == "Bash":
             "Blocked: cat is only allowed against .playwright-cli/ snapshots "
             "or docs/ux-journeys/ files."
         )
-    # Any output redirection must land in the journey directory.
-    if ">" in cmd and not ALLOWED_PATHS.search(cmd):
+    # Any output redirection must land in the journey directory. A JS arrow
+    # function (`page => ...`, e.g. scrolling an element into view via
+    # `playwright-cli run-code`) is not a redirect, so ignore `=>`.
+    if ">" in cmd.replace("=>", "") and not ALLOWED_PATHS.search(cmd):
         block(
             "Blocked: output redirection is only allowed into docs/ux-journeys/."
         )
