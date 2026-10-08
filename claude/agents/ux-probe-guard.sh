@@ -27,7 +27,7 @@ def block(msg):
 
 if tool in ("Read", "Write", "Edit"):
     path = tool_input.get("file_path", "")
-    if not ALLOWED_PATHS.search(path):
+    if not ALLOWED_PATHS.search(os.path.realpath(path) + "/"):
         block(
             "Blocked: the UX probe may only read browser snapshots "
             "(.playwright-cli/) and read/write its own journey files "
@@ -38,12 +38,21 @@ if tool in ("Read", "Write", "Edit"):
 
 elif tool == "Bash":
     cmd = tool_input.get("command", "")
-    # First word of each ;, &&, ||, | separated segment must be allow-listed.
+    # Command substitution runs commands the checks below never see, and
+    # the probe has no use for it.
+    if re.search(r'\$\(|`|[<>]\(', cmd):
+        block(
+            "Blocked: command substitution ($(...), backticks, <(...)) is not "
+            "part of the UX probe's remit. Run each command on its own."
+        )
+    # First word of each command segment must be allow-listed. Newlines and a
+    # lone & (background) separate commands just as ;, &&, || and | do.
     ALLOWED_FIRST = {
         "playwright-cli", "mkdir", "ls", "sleep", "echo", "cat",
         "pwd", "date", "true",
     }
-    for segment in re.split(r'[;|]|&&|\|\|', cmd):
+    segments = re.split(r'[;|&\n]', cmd)
+    for segment in segments:
         words = segment.strip().split()
         if not words:
             continue
@@ -55,13 +64,26 @@ elif tool == "Bash":
                 "command is genuinely necessary, do not retry variants — "
                 "explain the need in your final reply instead."
             )
-    # cat may only be used to append to the journey log (cat >> docs/...),
-    # or to read snapshots/journey files.
-    if re.search(r'(^|[;&|]\s*)cat\b', cmd) and not ALLOWED_PATHS.search(cmd):
-        block(
-            "Blocked: cat is only allowed against .playwright-cli/ snapshots "
-            "or docs/ux-journeys/ files."
-        )
+    # cat may only read snapshots/journey files: every file it is given must
+    # resolve there. (Redirect targets are checked separately below.)
+    cat_msg = ("Blocked: cat is only allowed against .playwright-cli/ snapshots "
+               "or docs/ux-journeys/ files.")
+    for segment in segments:
+        try:
+            words = list(shlex.shlex(segment, posix=True, punctuation_chars=True))
+        except ValueError:
+            block(cat_msg)
+        if not words or words[0] != "cat":
+            continue
+        skip_next = False
+        for word in words[1:]:
+            if skip_next:
+                skip_next = False
+            elif set(word) <= set("<>|&"):
+                skip_next = True
+            elif not word.startswith("-") and not ALLOWED_PATHS.search(
+                    os.path.realpath(word) + "/"):
+                block(cat_msg)
     # Any output redirection must land in the journey directory. Tokenise the
     # way the shell does, so a `>` inside a quoted argument (a JS arrow
     # function passed to `playwright-cli run-code`) isn't mistaken for a
