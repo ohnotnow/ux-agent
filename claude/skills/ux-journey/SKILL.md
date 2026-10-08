@@ -1,6 +1,6 @@
 ---
 name: ux-journey
-description: Task-driven UX discovery for a local Laravel app. A context-free subagent attempts a realistic end-user task cold ("create a cronjob for team X, silenced, daily") and the session compiles its think-aloud log into a journey report — a first-person "user report" of friction, wrong turns, and dead ends. Use when the user asks for a UX journey/probe/discovery, "how hard is it for a user to...", or "try doing X as a user and tell me where it hurts".
+description: Task-driven UX discovery for a local Laravel app. A context-free subagent attempts a realistic end-user task cold ("create a cronjob for team X, silenced, daily") and the session compiles its think-aloud log into a journey report — a first-person "user report" of friction, wrong turns, and dead ends. Use when the user asks for a UX journey/probe/discovery, "how hard is it for a user to...", or "try doing X as a user and tell me where it hurts". Has a screen-reader mode (needs a11y-agent): use it when the user asks what a task is like with a screen reader, or for an a11y journey.
 ---
 
 # UX journeys
@@ -87,6 +87,101 @@ max-width ~46rem.
 **7. Report back in chat**: outcome, the findings in brief, and — separately
 and labelled as such — your own design take if you have one. Findings go to
 `ait` only after the user has reviewed and accepted them, never auto-filed.
+
+## Screen-reader mode
+
+Use it when the user asks what the app is like with a screen reader ("is
+this pleasant to use for a blind user?", "do the a11y journey"). Passing
+WCAG checks is not the question here; the question is what the same task
+costs someone who can only hear the page. The same probe agent attempts
+the same task, perceiving the app only through a virtual screen reader,
+and a normal visual probe runs the task too as a baseline. The contrast
+("same answer: 6 actions by eye, 86 steps by ear") is the headline.
+
+**Needs a11y-agent** (github.com/ohnotnow/a11y-agent), for its reader
+bundle. Find the clone: `command -v a11y` gives a wrapper whose last line
+is `exec node "<clone>/dist/cli.js" "$@"`; the bundle is
+`<clone>/assets/vsr-bundle.js`. No wrapper: ask the user for the clone
+path. No clone: say screen-reader mode needs a11y-agent and stop. The
+helper, `sr-helper.js`, sits in this skill's directory.
+
+Output layout: `docs/ux-journeys/<slug>/visual/` (log + shots),
+`docs/ux-journeys/<slug>/screen-reader/` (log only), and one `report.html`
+at `<slug>/`.
+
+**Setup (you do this, not the probe).** Open a named session from the
+project root, log in yourself, then inject bundle and helper into the
+browser *context*, so every full page load re-injects them:
+
+```bash
+playwright-cli -s=probe-sr open <app-url>/login   # then fill + click to log in
+playwright-cli -s=probe-sr --raw run-code "async page => { await page.context().addInitScript({path: '<bundle>'}); await page.context().addInitScript({path: '<skill-dir>/sr-helper.js'}); await page.evaluate(() => sessionStorage.clear()); await page.goto('<start-url>'); return await page.evaluate(() => typeof window.__sr + ' ' + window.__sr.steps()); }"
+```
+
+Expect `"object 0"`. If the page has a strict Content-Security-Policy the
+script tags will be blocked: stop and tell the user (untried so far).
+
+**The pair: parallel only for read-only tasks.** Launch both probes in one
+message when the task only reads. If it creates or changes data, run them
+one after the other and reset the app state in between (step 2), or the
+second probe meets the first one's leftovers. Don't give each probe its
+own account instead: different accounts can see different things, which
+breaks the like-for-like comparison. The visual probe gets the normal
+briefing with `-s=probe-vis`, its output dir `<slug>/visual/`, and an
+instruction to keep its log with the Write tool rather than shell appends.
+
+**Screen-reader briefing.** App URL, task and output dir as usual, then
+this, verbatim:
+
+> Persona: you are a member of staff who is blind and uses a screen
+> reader. You cannot see the screen at all. Everything you know about the
+> app comes from what the screen reader speaks. You are already logged in;
+> the browser session `probe-sr` is on the app's start page.
+>
+> You operate the reader ONLY with commands of exactly this shape, one per
+> Bash call: `playwright-cli -s=probe-sr --raw eval "window.__sr.next()"`
+>
+> Actions (single quotes inside the double-quoted JS; never semicolons,
+> pipes, the > character, or arrow functions, which the guard blocks):
+> `next()` / `previous()`; `jump('Heading')` / `jumpBack('Heading')`, which
+> also take 'Link', 'Landmark', 'Main', 'Navigation', 'Form', 'Region',
+> 'HeadingLevel1' to 'HeadingLevel6'; `activate()` to press or follow the
+> current item; `press('Space')`, `press('Enter')` etc; `type('text')`.
+>
+> Each returns "[step N] what the reader said". Note step numbers in your
+> log. If a jump finds nothing of that kind you hear the current item
+> again; that is how this reader says "none found". Whatever the reader
+> does or doesn't tell you when you follow a link is part of the
+> experience: note it.
+>
+> Do NOT take screenshots, run `playwright-cli snapshot`, click, goto,
+> fill, eval anything but `window.__sr.*`, read `.playwright-cli` files, or
+> read the URL. Keep your journey log with the Write tool (rewrite the
+> whole file with the new entry at the end; never change earlier entries),
+> not cat or echo. No shots/ folder. Don't copy long URLs, tokens or
+> secrets you hear into the log; paraphrase them. Use headings, landmarks
+> and link jumps the way a real user would when they help, and say so when
+> they don't. When done: closing reflection, `playwright-cli -s=probe-sr
+> close`, then reply with whether you completed the task, your answer,
+> the total step count, and a one-paragraph summary.
+
+**Verify.** Both logs must end with a `## Closing reflection`. An Anthropic
+safety classifier sometimes kills probe runs (`reasoning_extraction`),
+before the first action or partway through. A log without its reflection
+is truncated: say so plainly, in chat and in the report, and never compile
+it as if it were complete. A killed probe never closes its browser: close
+its session yourself (`playwright-cli -s=<session> close`), then check no
+browsers are left (House conventions).
+
+**Report additions.** Open with the side-by-side: the task, both outcomes,
+visual actions vs screen-reader steps. Treat step counts as relative: the
+virtual reader announces boundaries ("end of list"; start, text and end of
+a paragraph), so a real reader would take fewer. The findings that
+matter most are the jumps that should have worked and didn't, and how long
+the forced linear walks were. State the simulation's assumptions in the
+framing: on a full page load the reader announces the title; after an
+in-place page swap (e.g. Livewire `wire:navigate`) it restarts at the top
+and announces nothing, because what a real reader says there is unknown.
 
 ## Honesty notes
 
