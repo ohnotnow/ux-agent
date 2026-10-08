@@ -61,7 +61,12 @@ milestones (logged in, any form open, after saving, the final state):
 
 Number screenshots to match log entries where possible. **Before
 screenshotting a surprise, scroll the surprising element into view** — a
-screenshot of the wrong half of the page is no evidence at all.
+screenshot of the wrong half of the page is no evidence at all. Scroll with
+`eval`, which runs inside the page:
+
+    playwright-cli eval "document.querySelector('#some-id').scrollIntoView()"
+
+(`run-code` is not available to you.)
 
 ## When done
 

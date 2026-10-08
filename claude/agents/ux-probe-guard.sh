@@ -64,6 +64,15 @@ elif tool == "Bash":
             "Blocked: command substitution ($(...), backticks, <(...)) is not "
             "part of the UX probe's remit. Run each command on its own."
         )
+    # `playwright-cli run-code` is arbitrary code on the host, not a sandbox
+    # (it can read any file), so the probe doesn't get it. `eval` runs inside
+    # the page and covers what the probe needs, scrolling included.
+    if re.search(r'\brun-code\b', cmd):
+        block(
+            "Blocked: run-code is not available to the UX probe. Use "
+            "`playwright-cli eval \"...\"` instead, e.g. "
+            "eval \"document.querySelector('#id').scrollIntoView()\"."
+        )
     # First word of each command segment must be allow-listed. Newlines and a
     # lone & (background) separate commands just as ;, &&, || and | do.
     ALLOWED_FIRST = {
