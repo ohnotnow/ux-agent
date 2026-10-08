@@ -13,7 +13,7 @@
 # The hook's JSON arrives on stdin, but `python3 -` needs stdin for the
 # program itself - so pass the JSON through the environment instead.
 INPUT="$(cat)" python3 - <<'PY'
-import json, os, re, sys
+import json, os, re, shlex, sys
 
 data = json.loads(os.environ.get("INPUT") or "{}")
 tool = data.get("tool_name", "")
@@ -62,16 +62,21 @@ elif tool == "Bash":
             "Blocked: cat is only allowed against .playwright-cli/ snapshots "
             "or docs/ux-journeys/ files."
         )
-    # Any output redirection must land in the journey directory. A JS arrow
-    # function (`page => ...`, e.g. scrolling an element into view via
-    # `playwright-cli run-code`) is not a redirect, so ignore `=>` - but only
-    # inside a quoted argument; an unquoted `=>/tmp/x` IS a redirect.
-    unarrowed = re.sub(r'"[^"]*"|\'[^\']*\'',
-                       lambda m: m.group(0).replace("=>", ""), cmd)
-    if ">" in unarrowed and not ALLOWED_PATHS.search(cmd):
-        block(
-            "Blocked: output redirection is only allowed into docs/ux-journeys/."
-        )
+    # Any output redirection must land in the journey directory. Tokenise the
+    # way the shell does, so a `>` inside a quoted argument (a JS arrow
+    # function passed to `playwright-cli run-code`) isn't mistaken for a
+    # redirect, and an escaped or unquoted one is. Unparseable: fail closed.
+    redirect_msg = "Blocked: output redirection is only allowed into docs/ux-journeys/."
+    try:
+        tokens = list(shlex.shlex(cmd, posix=True, punctuation_chars=True))
+    except ValueError:
+        block(redirect_msg)
+    for i, token in enumerate(tokens):
+        if ">" not in token or not set(token) <= set("<>|&"):
+            continue
+        target = tokens[i + 1] if i + 1 < len(tokens) else ""
+        if not ALLOWED_PATHS.search(os.path.realpath(target) + "/"):
+            block(redirect_msg)
 
 sys.exit(0)
 PY
