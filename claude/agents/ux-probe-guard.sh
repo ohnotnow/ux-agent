@@ -64,8 +64,11 @@ elif tool == "Bash":
         )
     # Any output redirection must land in the journey directory. A JS arrow
     # function (`page => ...`, e.g. scrolling an element into view via
-    # `playwright-cli run-code`) is not a redirect, so ignore `=>`.
-    if ">" in cmd.replace("=>", "") and not ALLOWED_PATHS.search(cmd):
+    # `playwright-cli run-code`) is not a redirect, so ignore `=>` - but only
+    # inside a quoted argument; an unquoted `=>/tmp/x` IS a redirect.
+    unarrowed = re.sub(r'"[^"]*"|\'[^\']*\'',
+                       lambda m: m.group(0).replace("=>", ""), cmd)
+    if ">" in unarrowed and not ALLOWED_PATHS.search(cmd):
         block(
             "Blocked: output redirection is only allowed into docs/ux-journeys/."
         )
