@@ -8,8 +8,9 @@ allowed-tools: Bash(playwright-cli:*) Bash(ffmpeg:*) Bash(ffprobe:*)
 
 Reproduce a flow the developer describes and hand back a video of what
 actually happens, plus anything noticed along the way. This is a debugging
-aid, not documentation: record raw, at natural automation speed, with no
-overlays, chapters, or staged pacing. The mess is the point.
+aid, not documentation: record raw, with no chapters or staged pacing. The
+mess is the point. The one decoration is a marker on each click point, so
+the developer can see what was actually clicked (see the workflow).
 
 Mechanics of driving the browser are in the `playwright-cli` skill — this
 skill is the house conventions and the debugging posture.
@@ -63,7 +64,21 @@ report says "on mobile":
    can reach the failure. Reset any state you disturbed.
 2. Record the reproduction — `playwright-cli video-start <path>` … actions …
    `video-stop` is usually enough. Use a `run-code` script instead when the
-   repro needs precise sequencing.
+   repro needs precise sequencing. Straight after `video-start`, turn on the
+   click marker (an animated pointer plus a red dot on each click point):
+
+   ```bash
+   playwright-cli video-show-actions --duration=300 \
+     --point-style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255, 0, 0, .6); box-shadow: 0 0 0 3px #fff" \
+     --title-style="display: none"
+   ```
+
+   In a `run-code` script the equivalent is `page.screencast.showActions({
+   duration: 300, style: { point: '...', title: 'display: none' } })`.
+   The marker delays every action by roughly its duration. That can hide
+   timing bugs (double submits, a request racing the previous one). If
+   the bug smells timing-related and won't reproduce, record again without
+   the marker and say so in the report.
 3. While recording (or just after), gather the evidence a video can't show:
    `playwright-cli console` and `playwright-cli requests`. A 500 or a missing
    Livewire update request next to the video is usually the diagnosis.

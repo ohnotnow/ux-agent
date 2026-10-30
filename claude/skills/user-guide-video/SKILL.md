@@ -69,6 +69,13 @@ the step they're stuck on, and a botched step is re-filmed alone.
   `pressSequentially(text, { delay: 70 })`; ~900ms settle at clip start;
   ~400ms "thinking" pause before a click; 1200–1600ms hold at clip end.
 - Viewport 1280×800, and the screencast `size` must match.
+- Show where each click lands: call `page.screencast.showActions()` once,
+  before the first `screencast.start` (see skeleton). It animates a mouse
+  pointer between actions and leaves a fading red dot on each click point,
+  so viewers can see what opened a modal or flyout. It survives
+  `stop()`/`start()` between clips and works inside native modal dialogs
+  (both verified Oct 2026). It also paces every action by its `duration`
+  (~850ms per click at 800).
 - Hide the debugbar on every navigation via `page.addInitScript` injecting
   `.phpdebugbar { display: none !important; }`.
 - At most one highlight per clip: a `page.screencast.showOverlay()` ring
@@ -97,6 +104,15 @@ async page => {
   // ---- Prep (not recorded): reset state, log out ----
   // ...
   await page.context().clearCookies();
+
+  // Pointer + click marker for every clip
+  await page.screencast.showActions({
+    duration: 800,
+    style: {
+      point: 'width: 24px; height: 24px; border-radius: 50%; background: rgba(255, 0, 0, .6); box-shadow: 0 0 0 3px #fff',
+      title: 'display: none',
+    },
+  });
 
   // ---- Clip 1 ----
   await page.goto(BASE + '/login');
@@ -146,8 +162,8 @@ is a house convention: it lives in one clearly marked block at the top of
 **7. Verify before handing over.** `ffprobe` each clip's duration against the
 script's arithmetic, then extract a frame or two
 (`ffmpeg -ss <t> -i clip.mp4 -frames:v 1 frame.png`) and *look at them*:
-debugbar hidden? highlight ring visible? text actually typed? Report what you
-checked.
+debugbar hidden? highlight ring visible? click marker visible? text actually
+typed? Report what you checked.
 
 ## House conventions
 
